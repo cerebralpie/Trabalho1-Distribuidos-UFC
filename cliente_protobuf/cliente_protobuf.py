@@ -1,0 +1,3 @@
+PORTA = 8081
+PROTOCOLO = 'HTTP'
+
