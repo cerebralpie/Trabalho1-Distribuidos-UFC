@@ -4,7 +4,7 @@ import interface as inter
 import json
 import time, datetime
 
-PORTA = 8082
+PORTA = 8081
 PROTOCOLO = 'TCP'
 
 
@@ -12,7 +12,7 @@ def autenticar():
     srv.autenticar(2, PORTA) # Autentica servidor json
     
 def enviar_mensagem(mensagem):
-    resposta = srv.enviar_tcp(mensagem, PORTA)
+    resposta = srv.enviar_tcp(2, mensagem, PORTA)
     return resposta
 
 def menu_json():
@@ -22,18 +22,22 @@ def menu_json():
     mensagem = {
         'tipo' : 'operacao',
         'token' : token,
-        'operacao' : 'status', 
+        'operacao' : 'status'
     }
     mensagem = json.dumps(mensagem)
 
+    print(mensagem)
     res_servidor = enviar_mensagem(mensagem)
+    print(res_servidor)
     res_servidor = json.loads(res_servidor)
     print('Estado do servidor: {}'.format(res_servidor['status']))
 
-    if res_servidor['status'] == 'None': # Autenticar e guardar novo token
-        autenticar()
-        token = arquivo.read()
+    autenticar()
+    arquivo = open('cliente_json/token.txt', 'r')
+    token = arquivo.read()
 
+    arquivo.close()
+    
     while True:
         inter.menu_operacoes()
         resposta = int(input())
@@ -44,9 +48,9 @@ def menu_json():
 
         if resposta == 1: # Status servidor
             mensagem = {
-                'tipo' = 'operacao',
-                'token' = token,
-                
+                'tipo' : 'operacao',
+                'token' : token,
+                'operacao' : 'status'
             }
             
             #'OP|token={}|operacao=status|FIM'.format(token)

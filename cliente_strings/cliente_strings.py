@@ -8,7 +8,7 @@ def autenticar():
     srv.autenticar(1, PORTA) # Autentica servidor strings
     
 def enviar_mensagem(mensagem):
-    resposta = srv.enviar_tcp(mensagem, PORTA)
+    resposta = srv.enviar_tcp(1, mensagem, PORTA)
     return resposta
 
 def menu_strings():
@@ -16,12 +16,15 @@ def menu_strings():
     arquivo = open('cliente_strings/token.txt', 'r')
     token = arquivo.read()
     mensagem = 'OP|token={}|operacao=status|FIM'.format(token)
-    status, operacoes_processadas, tempo_ativo = enviar_mensagem(mensagem)
-    print('Estado do servidor: {}'.format(status))
+    resposta = enviar_mensagem(mensagem)
+    resposta = resposta.split('|')
+    print('Estado do servidor: {}'.format(resposta[0]))
 
-    if status == 'None': # Autenticar e guardar novo token
+    if resposta[0] == 'ERROR': # Autenticar e guardar novo token
         autenticar()
         token = arquivo.read()
+
+    arquivo.close()
 
     while True:
         inter.menu_operacoes()
