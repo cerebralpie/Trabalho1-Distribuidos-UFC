@@ -19,6 +19,7 @@ def menu_json():
     # Verificar se token ainda eh valido
     arquivo = open('cliente_json/token.txt', 'r')
     token = arquivo.read()
+    arquivo.close()
     mensagem = {
         'tipo' : 'operacao',
         'token' : token,
@@ -26,17 +27,14 @@ def menu_json():
     }
     mensagem = json.dumps(mensagem)
 
-    print(mensagem)
     res_servidor = enviar_mensagem(mensagem)
-    print(res_servidor)
     res_servidor = json.loads(res_servidor)
-    print('Estado do servidor: {}'.format(res_servidor['status']))
 
-    autenticar()
-    arquivo = open('cliente_json/token.txt', 'r')
-    token = arquivo.read()
-
-    arquivo.close()
+    if res_servidor['sucesso'] == False:
+        autenticar()
+        arquivo = open('cliente_json/token.txt', 'r')
+        token = arquivo.read()
+        arquivo.close()
     
     while True:
         inter.menu_operacoes()
@@ -54,7 +52,11 @@ def menu_json():
             }
             
             #'OP|token={}|operacao=status|FIM'.format(token)
-            enviar_mensagem(mensagem)
+            mensagem = json.dumps(mensagem)
+            res_servidor = enviar_mensagem(mensagem)
+            res_servidor = json.loads(res_servidor)
+            print('Resposta do servidor:')
+            print(res_servidor)
             inter.pressione_enter()
             continue
 

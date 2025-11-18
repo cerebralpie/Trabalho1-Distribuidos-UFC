@@ -15,6 +15,7 @@ def menu_strings():
     # Verificar se token ainda eh valido
     arquivo = open('cliente_strings/token.txt', 'r')
     token = arquivo.read()
+    arquivo.close()
     mensagem = 'OP|token={}|operacao=status|FIM'.format(token)
     resposta = enviar_mensagem(mensagem)
     resposta = resposta.split('|')
@@ -22,9 +23,10 @@ def menu_strings():
 
     if resposta[0] == 'ERROR': # Autenticar e guardar novo token
         autenticar()
+        arquivo = open('cliente_strings/token.txt', 'r')
         token = arquivo.read()
+        arquivo.close()
 
-    arquivo.close()
 
     while True:
         inter.menu_operacoes()
@@ -36,12 +38,55 @@ def menu_strings():
 
         if resposta == 1: # Status servidor
             mensagem = 'OP|token={}|operacao=status|FIM'.format(token)
-            enviar_mensagem(mensagem)
+            res_servidor = enviar_mensagem(mensagem)
+            print('Resposta do servidor:')
+            print(res_servidor)
+            inter.pressione_enter()
+            continue
+
+        elif resposta == 2: # Timestamp do servidor
+            mensagem = 'OP|token={}|operacao=timestamp|FIM'.format(token)
+            res_servidor = enviar_mensagem(mensagem)
+            print('Resposta do servidor:')
+            print(res_servidor)
+            inter.pressione_enter()
+            continue
+
+        elif resposta == 3: # Historico de uso
+            mensagem = 'OP|token={}|operacao=historico|FIM'.format(token)
+            res_servidor = enviar_mensagem(mensagem)
+            print('Resposta do servidor:')
+            print(res_servidor)
+            inter.pressione_enter()
+            continue
+
+        elif resposta == 4: # Echo
+            print('\n')
+            print('Digite a mensagem a ser enviada:')
+            mensagem_echo = input()
+            mensagem = 'OP|token={}|operacao=echo|mensagem={}|FIM'.format(token, mensagem_echo)
+            res_servidor = enviar_mensagem(mensagem)
+            print('Resposta do servidor:')
+            print(res_servidor)
+            inter.pressione_enter()
+            continue
+
+        elif resposta == 5: # Soma
+            print('\n')
+            print('Digite os numeros a serem enviados (separados por espaço):')
+            lista_num = input()
+            lista_num = lista_num.split(' ')
+            mensagem = 'OP|token={}|operacao=echo|mensagem={}|FIM'.format(token, lista_num)
+            res_servidor = enviar_mensagem(mensagem)
+            print('Resposta do servidor:')
+            print(res_servidor)
             inter.pressione_enter()
             continue
 
         elif resposta == 9:
             mensagem = 'OP|token={}|operacao=logout|FIM'.format(token)
-            enviar_mensagem(mensagem)
+            res_servidor = enviar_mensagem(mensagem)
+            print('Resposta do servidor:')
+            print(res_servidor)
             inter.pressione_enter()
             break
