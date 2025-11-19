@@ -1,22 +1,25 @@
 import cliente_protobuf.sd_protocol_pb2 as sdpb
+import interface as inter
 import socket
 import time, datetime
 import json
 import struct
-
-# Conexao
-CHAVE_ACESSO = '538045'
+import sys
 
 def criar_socket():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     return s
 
 def enviar_tcp(socket, mensagem, protobuf_msg=False):
+    inicio_tempo = time.perf_counter()
+
     msg = mensagem
     if not protobuf_msg:
         try:
             socket.sendall(bytes(msg, 'utf-8'))
+            print('Enviado pacote de {} bytes'.format(sys.getsizeof(msg)))
             data = socket.recv(1024).decode('utf-8')
+            print('Recebido pacote de {} bytes'.format(sys.getsizeof(data)))
             #s.close()
         except Exception as e:
             print(e)
@@ -29,19 +32,25 @@ def enviar_tcp(socket, mensagem, protobuf_msg=False):
         pacote = header + msg
         try:
             socket.sendall(pacote)
+            print('Enviado pacote de {} bytes'.format(sys.getsizeof(pacote)))
             header_resp = socket.recv(4)
             tamanho_resp = struct.unpack('>I', header_resp)[0]
             data = socket.recv(1024)
+            print('Recebido pacote de {} bytes'.format(sys.getsizeof(data)))
             #s.close()
         except Exception as e:
             print(e)
             exit()
         # print ('REPOSTA SERVIDOR: {s}'.format(s=repr(data)))
 
+    fim_tempo = time.perf_counter()
+    total_tempo = fim_tempo - inicio_tempo
+    total_tempo = total_tempo*1000 # Para ficar em ms
+    print(f'Tempo da comunicação: {total_tempo:.6f} ms')
+
     return data
 
-
-def autenticar(socket, protocolo, porta, host='3.88.99.255', chave=CHAVE_ACESSO):
+def autenticar(socket, protocolo, porta, matricula, host='3.88.99.255'):
     PORT = porta
     HOST = host
     ts = time.time()
@@ -49,13 +58,10 @@ def autenticar(socket, protocolo, porta, host='3.88.99.255', chave=CHAVE_ACESSO)
     protocolo = int(protocolo)
 
     try:
-        try: 
-            socket.connect((HOST, PORT))
-        except:
-            socket.connect(('192.168.100.4', PORT))
+        socket.connect((HOST, PORT))
 
         if protocolo == 1: # String
-            mensagem = 'AUTH|aluno_id={}|timestamp={}|FIM'.format(chave, timestamp)
+            mensagem = 'AUTH|aluno_id={}|timestamp={}|FIM'.format(matricula, timestamp)
             print(mensagem)
             resposta = enviar_tcp(socket, mensagem)
             print(resposta)
@@ -67,7 +73,7 @@ def autenticar(socket, protocolo, porta, host='3.88.99.255', chave=CHAVE_ACESSO)
         elif protocolo == 2: # Json
             mensagem = {
                 'tipo' : 'autenticar',
-                'aluno_id' : chave,
+                'aluno_id' : matricula,
                 'timestamp' : timestamp, 
             }
             mensagem = json.dumps(mensagem)
@@ -82,7 +88,7 @@ def autenticar(socket, protocolo, porta, host='3.88.99.255', chave=CHAVE_ACESSO)
 
         elif protocolo == 3: # Protobuf
             mensagem = sdpb.Requisicao()
-            mensagem.auth.aluno_id = CHAVE_ACESSO
+            mensagem.auth.aluno_id = matricula
             mensagem.auth.timestamp_cliente = timestamp
             mensagem = mensagem.SerializeToString()
             print(mensagem)
@@ -107,3 +113,54 @@ def autenticar(socket, protocolo, porta, host='3.88.99.255', chave=CHAVE_ACESSO)
 
     print('Autenticado com sucesso!')
 
+
+def recuperar_sessao(socket, protocolo, token):
+    if protocolo == 1: # Strings
+        # Verificar se token ainda eh valido
+        mensagem = 'OP|token={}|operacao=status|FIM'.format(token)
+        print(mensagem)
+        resposta = enviar_tcp(socket, mensagem)
+        print(resposta)
+        resposta = resposta.split('|')
+        print('Estado do servidor: {}'.format(resposta[0]))
+
+        if resposta[0] == 'ERROR': # Autenticar e guardar novo token
+            print('Sem sessoes para recuperar, realize novo login!')
+            inter.pressione_enter()
+            return False
+        
+    if protocolo == 2: # JSON
+        mensagem = {
+                'tipo' : 'operacao',
+                'token' : token,
+                'operacao' : 'status'
+            }
+            
+        mensagem = json.dumps(mensagem)
+        res_servidor = enviar_tcp(socket, mensagem)
+        res_servidor = json.loads(res_servidor)
+
+        if res_servidor['sucesso'] == False:
+            print('Sem sessoes para recuperar, realize novo login!')
+            inter.pressione_enter()
+            return False
+        
+    if protocolo == 3: # Protobuf
+        mensagem = sdpb.Requisicao()
+        mensagem.operacao.token = token
+        mensagem.operacao.operacao = 'status'
+        mensagem = mensagem.SerializeToString()
+        print(mensagem)
+
+        resposta = enviar_tcp(socket, mensagem)
+        resposta_pb = sdpb.Resposta()
+        resposta_pb.ParseFromString(resposta)
+        print(resposta_pb)
+        return False
+        
+        #if resposta_pb. == False:
+        #    print('Sem sessoes para recuperar, realize novo login!')
+        #    inter.pressione_enter()
+        #    return False
+
+    return True

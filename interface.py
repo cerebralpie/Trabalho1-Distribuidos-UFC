@@ -1,3 +1,11 @@
+def menu_login():
+    print('\n')
+    print('Bem vindo! O que deseja fazer?')
+    print('\n')
+    print('1 - Novo Login')
+    print('2 - Restaurar Sessão')
+    print('9 - sair')
+
 def menu_principal():
     print('\n')
     print('Olá, usuário! Escolha um protocolo:')

@@ -27,7 +27,7 @@ def main():
             cjson.menu_json()
 
         elif resposta1 == 3:
-            cpb.menu_protobuf1()
+            cpb.menu_protobuf()
 
         elif resposta1 == 9:
             break
