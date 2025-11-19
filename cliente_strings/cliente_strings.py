@@ -2,7 +2,6 @@ import servidor as srv
 import interface as inter
 
 PORTA = 8080
-PROTOCOLO = 'TCP'
 
 def autenticar(socket):
     srv.autenticar(socket, 1, PORTA) # Autentica servidor strings
@@ -80,8 +79,11 @@ def menu_strings():
             print('\n')
             print('Digite os numeros a serem enviados (separados por espaço):')
             lista_num = input()
-            lista_num = lista_num.split(' ')
-            mensagem = 'OP|token={}|operacao=soma|numeros=(1 2 3)|FIM'.format(token)
+            #lista_num = lista_num.split(' ')
+            print(lista_num)
+            print(repr(lista_num))
+            mensagem = 'OP|token={}|operacao=soma|numeros={}|FIM'.format(token, lista_num)
+            print(mensagem)
             res_servidor = enviar_mensagem(sessao, mensagem)
             print('Resposta do servidor:')
             print(res_servidor)
