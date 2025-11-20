@@ -1,14 +1,14 @@
 # Trabalho 1 de Sistemas Distribuídos
-Universidade Federal do Ceará
-Eduardo Monteiro de Sousa
-Matrícula 538045
-Semestre 2025.2
+Universidade Federal do Ceará  
+Eduardo Monteiro de Sousa  
+Matrícula 538045  
+Semestre 2025.2  
 
-Para executar o projeto, primeiro execute "python3 -m venv venv" e em seguida "source venv/bin/activate"
-Após isso, instalar as libs necessárias com "pip3 install -r requirements.txt".
-Finalmente, para executar o projeto, rode "python3 main.py"
+Para executar o projeto, primeiro execute "python3 -m venv venv" e em seguida "source venv/bin/activate".  
+Após isso, instalar as libs necessárias com "pip3 install -r requirements.txt".  
+Finalmente, para executar o projeto, rode "python3 main.py".  
 
-Abaixo está a estrutura completa do projeto:
+Abaixo está a estrutura completa do projeto:  
 
 ```text
 .
@@ -52,5 +52,6 @@ Abaixo está a estrutura completa do projeto:
 ├── requirements.txt
 └── servidor.py
 ```
+
 
 
