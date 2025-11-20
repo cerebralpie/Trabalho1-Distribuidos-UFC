@@ -3,8 +3,8 @@ import interface as inter
 
 PORTA = 8080
 
-def autenticar(socket):
-    srv.autenticar(socket, 1, PORTA) # Autentica servidor strings
+def autenticar(socket, matricula):
+    srv.autenticar(socket, 1, PORTA, matricula) # Autentica servidor strings
     
 def enviar_mensagem(socket, mensagem):
     resposta = srv.enviar_tcp(socket, mensagem)
@@ -38,6 +38,9 @@ def menu_strings():
                 logado = True
             else:
                 continue
+
+        elif resposta1 == 9:
+            break
 
         while logado and True:
             inter.menu_operacoes()
